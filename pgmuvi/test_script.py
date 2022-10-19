@@ -101,14 +101,14 @@ def run_pgmuvi(LCfile = 'AlfOriAAVSO_Vband.csv', timecolumn = 'JD', \
         """ Let's generate some synthetic data from a perturbed sine curve 
             but on the same time sampling as the real data"""
 
-        P = np.random.uniform(30, 300)#137. #Days!
+        P         = np.random.uniform(30, 300)#137. #Days!
         print("True period: ",P," days")
-        n_data = 400
-        jd_min = 2450000
+        n_data    = 400
+        jd_min    = 2450000
         n_periods = np.random.uniform(3,100)
-        jd_max = jd_min + P*(n_periods)
+        jd_max    = jd_min + P*(n_periods)
         print("Simulating for ",n_periods," periods")
-        train_jd = torch.Tensor(np.random.uniform(jd_min, jd_max, size=n_data))
+        train_jd  = torch.Tensor(np.random.uniform(jd_min, jd_max, size=n_data))
         train_mag = torch.sin(train_jd*(2*np.pi/P))
         train_mag = train_mag + 0.1*torch.randn_like(train_mag)
         train_mag_err = 0.1*train_mag
@@ -116,9 +116,9 @@ def run_pgmuvi(LCfile = 'AlfOriAAVSO_Vband.csv', timecolumn = 'JD', \
         period_guess = P*(np.random.uniform()+0.5)#147 #this number is in the same units as our original input.
     else:
         #testdata = pd.read_csv("~/projects/betelgeuseScuba2/AlfOriAAVSO_Vband.csv")#[-700:]
-        testdata = pd.read_csv(LCfile)
+        testdata  = pd.read_csv(LCfile)
         #train_jd = torch.Tensor(testdata['JD'].to_numpy())
-        train_jd = torch.Tensor(testdata[timecolumn].to_numpy())
+        train_jd  = torch.Tensor(testdata[timecolumn].to_numpy())
         train_mag = torch.Tensor(testdata[magcolumn].to_numpy())
         print(len(train_jd))
         #train_mag = torch.Tensor(testdata['Magnitude'].to_numpy())
@@ -184,18 +184,24 @@ def run_pgmuvi(LCfile = 'AlfOriAAVSO_Vband.csv', timecolumn = 'JD', \
 
     hypers = {
         'likelihood.noise_covar.noise': torch.tensor(0.1),
-        'covar_module.mixture_means': (1/period_guess.clone().detach()), #torch.tensor(-2.),
+        'covar_module.mixture_means'  : (1/period_guess.clone().detach()), #torch.tensor(-2.),
         'covar_module.mixture_weights': torch.tensor(1.),
-        'covar_module.mixture_scales': torch.tensor(1.),
-        'mean_module.constant': torch.tensor(0.),
+        'covar_module.mixture_scales' : torch.tensor(1.),
+        'mean_module.constant'        : torch.tensor(0.),
     }
     model.initialize(**hypers)
 
-    print("Initial z-scaled period: ", 1./(model.sci_kernel.mixture_means.item())) #for a single component
-    print("Initial period: ", date_range * 1./(model.sci_kernel.mixture_means.item())) #for a single component
-    print("Inital width: ", (model.sci_kernel.mixture_scales.item()/model.sci_kernel.mixture_means.item()) * (date_range/(model.sci_kernel.mixture_means.item())))
-    print("Initial weight: ", model.sci_kernel.mixture_weights.item())
-    print("Additional noise: ", model.likelihood.noise_covar.noise.item())
+    print("Initial z-scaled period: ", \
+          1./(model.sci_kernel.mixture_means.item())) #for a single component
+    print("Initial period: ", \
+          date_range * 1./(model.sci_kernel.mixture_means.item())) #for a single component
+    print("Inital width: ", \
+          (model.sci_kernel.mixture_scales.item()/model.sci_kernel.mixture_means.item())*\
+          (date_range/(model.sci_kernel.mixture_means.item())))
+    print("Initial weight: ", \
+          model.sci_kernel.mixture_weights.item())
+    print("Additional noise: ", \
+          model.likelihood.noise_covar.noise.item())
 
     #print(model)
     #print(model.covar_module)
@@ -389,4 +395,6 @@ def run_pgmuvi(LCfile = 'AlfOriAAVSO_Vband.csv', timecolumn = 'JD', \
 
 
 if __name__=="__main__":
-    run_pgmuvi(LCfile="~/projects/betelgeuseScuba2/AlfOriAAVSO_Vband.csv")
+    #run_pgmuvi(LCfile="~/projects/betelgeuseScuba2/AlfOriAAVSO_Vband.csv")
+    #run_pgmuvi(LCfile="../../dataset/AlfOriAAVSO_Vband.csv")
+    print()
