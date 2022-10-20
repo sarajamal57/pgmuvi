@@ -17,6 +17,16 @@ import pyro.distributions as dist
 
 from astropy import units
 
+## Set the seed
+import random
+SEED=0
+## "gpytorch.utils.errors.NotPSDError: Matrix not positive definite after repeatedly adding jitter up to 1.0e-04."
+# SEED=42
+torch.manual_seed(SEED)
+random.seed(SEED)
+np.random.seed(SEED)
+
+
 def parse_results(results):
     loss = results['loss']
     print("Final loss: ",loss[-1])
@@ -158,7 +168,7 @@ def run_pgmuvi(LCfile = 'AlfOriAAVSO_Vband.csv', timecolumn = 'JD', \
     #model = SMKG(train_jd, train_mag, likelihood, num_mixtures = n_mix, grid_size=4000)
     model = SMG(train_jd, train_mag, likelihood, num_mixtures = n_mix)
 
-    train_method=False #"NUTS"
+    train_method="NUTS" #False, "NUTS"
 
     #model.covar_module.base_kernel.raw_mixture_means.item = torch.Tensor([[[np.log10(1/100)]]])
 
@@ -397,4 +407,5 @@ def run_pgmuvi(LCfile = 'AlfOriAAVSO_Vband.csv', timecolumn = 'JD', \
 if __name__=="__main__":
     #run_pgmuvi(LCfile="~/projects/betelgeuseScuba2/AlfOriAAVSO_Vband.csv")
     #run_pgmuvi(LCfile="../../dataset/AlfOriAAVSO_Vband.csv")
-    print()
+    run_pgmuvi(synthetic_data=True)
+    print('test_script.')
